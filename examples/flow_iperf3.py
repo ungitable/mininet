@@ -9,11 +9,8 @@ from mininet.node import OVSKernelSwitch, UserSwitch
 from mininet.node import IVSSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from mininet.link import TCLink, Intf
 from subprocess import call
 from threading import Thread
-from ryu.lib import ofctl_v1_3
-from ryu.ofproto import ofproto_v1_3_parser
 
 
 def cmd_client(host, dst_host, port, flow_type, rate):
@@ -162,14 +159,7 @@ def myNetwork():
                     ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
                     ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.8,action=meter:5,output:4" -O OpenFlow13; \
                     ')
-    # ovs-ofctl dump-meter s2 -O OpenFlow13; \
     print(output)
-
-    # output = c0.cmd('ovs-ofctl add-flow s2 "priority=5,ip,nw_dst=10.0.0.5, \
-    #        actions=set_queue:0,normal" -O OpenFlow13 \
-    #                 ovs-ofctl add-flow s2 "priority=5,ip,nw_dst=10.0.0.6, \
-    #        actions=set_queue:1,normal" -O OpenFlow13')
-    # print(output)
 
     
     turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8) # this commmend is incredibly important
@@ -210,6 +200,7 @@ def myNetwork():
         sleep(0.1)
 
     case_id = '0x02'
+
     sleep(5.0) # why the sleeping time does not affect executing instructions?
 
     if case_id == '0x00':
@@ -236,22 +227,6 @@ def myNetwork():
                         \
                         ')
 
-
-    # output = c0.cmd('ovs-vsctl set bridge s2 datapath_type=netdev; \
-    #                 ovs-vsctl set bridge s2 protocols=OpenFlow13; \
-    #                 ')
-    # if h7 == 'tcp':
-    #     output = c0.cmd('ovs-ofctl add-meter s2 "meter=4,kbps,burst,band=type=drop,rate=1280,burst_size=1280" -O OpenFlow13; \
-    #                     ovs-ofctl add-flow s2 "table=0,in_port=5,ip,nw_src=10.0.0.3,action=meter:4,output:3" -O OpenFlow13; \
-    #                     ')
-    # if h8 == 'tcp':
-    #     output = c0.cmd('ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate=1280,burst_size=1280" -O OpenFlow13; \
-    #                     ovs-ofctl add-flow s2 "table=0,in_port=5,ip,nw_src=10.0.0.4,action=meter:5,output:4" -O OpenFlow13; \
-    #                     ')
-    # # ovs-ofctl dump-meter s2 -O OpenFlow13; \
-    # print(output)
-
-
     CLI(net)
 
     net.stop()
@@ -263,4 +238,3 @@ def myNetwork():
 if __name__ == '__main__':
     setLogLevel( 'info' )
     myNetwork()
-
