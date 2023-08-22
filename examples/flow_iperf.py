@@ -22,7 +22,7 @@ def cmd_client(host, dst_host, port, flow_type, rate):
     filename = str(host) + 'client' + str(port) + '.out'
 
     host.cmd( 'iperf ' + flow + ' -c ' + str(dst_host.IP()) + ' -p ' + str(port) + 
-             ' -b ' + str(rate) + 'M -i 1 -t 60 -e ' \
+             ' -b ' + str(rate) + 'M -i 1 -t 45 -e ' \
              ' > /home/mininet/Desktop/flow-data/' + filename +' & ')
 
 
@@ -118,16 +118,16 @@ def myNetwork():
                     ovs-vsctl set bridge s1 protocols=OpenFlow13; \
                     \
                     ovs-ofctl add-meter s2 "meter=2,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
-                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.5,action=meter:2,output:1" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.5,action=meter:2,output:1" -O OpenFlow13; \
                     \
                     ovs-ofctl add-meter s2 "meter=3,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
-                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.6,action=meter:3,output:2" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.6,action=meter:3,output:2" -O OpenFlow13; \
                     \
                     ovs-ofctl add-meter s2 "meter=4,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
-                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.7,action=meter:4,output:3" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.7,action=meter:4,output:3" -O OpenFlow13; \
                     \
                     ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
-                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.8,action=meter:5,output:4" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.8,action=meter:5,output:4" -O OpenFlow13; \
                     ')
     print(output)
 
@@ -141,6 +141,8 @@ def myNetwork():
     flow_host12 = 'udp'
     flow_host34 = 'udp'
 
+    sleep(5.0)
+
     servers = []
     servers.append(Thread(target=cmd_server, args=(h8, 5048, flow_host34)))
     servers.append(Thread(target=cmd_server, args=(h5, 5035, flow_host34)))
@@ -153,7 +155,7 @@ def myNetwork():
     
     for server in servers:
         server.start()
-        sleep(0.1)
+        sleep(0.02)
     
     clients = []
     clients.append(Thread(target=cmd_client, args=(h1, h5, 5015, flow_host12, speed_host12)))
@@ -167,7 +169,7 @@ def myNetwork():
 
     for client in clients:
         client.start()
-        sleep(0.1)
+        sleep(0.02)
 
 
     case_id = '0x02'
@@ -177,23 +179,23 @@ def myNetwork():
     if case_id == '0x00':
         pass
     elif case_id == '0x01' or case_id == '0x02':
-        output = c0.cmd('ovs-ofctl add-meter s1 "meter=10,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+        output = c0.cmd('ovs-ofctl add-meter s1 "meter=10,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.3,nw_dst=10.0.0.7,action=meter:10,output:5" -O OpenFlow13; \
                         \
-                        ovs-ofctl add-meter s1 "meter=11,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+                        ovs-ofctl add-meter s1 "meter=11,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.4,nw_dst=10.0.0.8,action=meter:11,output:5" -O OpenFlow13; \
                         ')
     elif case_id == '0x03':
-        output = c0.cmd('ovs-ofctl add-meter s1 "meter=10,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+        output = c0.cmd('ovs-ofctl add-meter s1 "meter=10,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.3,nw_dst=10.0.0.7,action=meter:10,output:5" -O OpenFlow13; \
                         \
-                        ovs-ofctl add-meter s1 "meter=11,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+                        ovs-ofctl add-meter s1 "meter=11,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.4,nw_dst=10.0.0.8,action=meter:11,output:5" -O OpenFlow13; \
                         \
-                        ovs-ofctl add-meter s1 "meter=12,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+                        ovs-ofctl add-meter s1 "meter=12,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.1,nw_dst=10.0.0.7,action=meter:12,output:5" -O OpenFlow13; \
                         \
-                        ovs-ofctl add-meter s1 "meter=13,kbps,burst,band=type=drop,rate=2560,burst_size=2560" -O OpenFlow13; \
+                        ovs-ofctl add-meter s1 "meter=13,kbps,band=type=drop,rate=5120" -O OpenFlow13; \
                         ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.2,nw_dst=10.0.0.8,action=meter:13,output:5" -O OpenFlow13; \
                         \
                         ')
