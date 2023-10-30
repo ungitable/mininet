@@ -2,6 +2,7 @@
 
 import os
 from time import sleep
+from mininet.examples.popen import monitorhosts
 from mininet.net import Mininet
 from mininet.node import Controller, RemoteController, OVSController
 from mininet.node import CPULimitedHost, Host, Node
@@ -11,30 +12,45 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 from subprocess import call
 from threading import Thread
+from get_lost import Lost
+import subprocess
 
 
 def cmd_client(host, dst_host, port, flow_type, rate):
     flow = ''
-    if flow_type == 'tcp':
-        filename = str(host) + 'client' + str(port) + ''
-        host.cmd( 'iperf3 -V ' + flow + ' -c ' + str(dst_host.IP()) + ' -p ' + str(port) + 
-             ' -b ' + str(rate) + 'M  -i 1 -t 20 ' \
-             ' 2>&1 | /home/mininet/Desktop/c3p/' + filename + ' & ')
-        return
     
     if flow_type == 'udp':
         flow = '-u'
 
     filename = str(host) + 'client' + str(port) + '.out'
-    host.cmd( 'iperf3 -V ' + flow + ' -c ' + str(dst_host.IP()) + ' -p ' + str(port) + 
-             ' -b ' + str(rate) + 'M -i 1 -t 20 ' \
-             ' 2>&1 | tee -a /home/mininet/Desktop/c3p/' + filename +' & ')
-    
-def cmd_server(host, port):
-    filename = str(host) + 'server' + str(port) + ''
-    host.cmd( 'iperf3 -V -s -i 1 -p ' + str(port) + 
+    host.cmd( 'iperf3  ' + flow + ' -c ' + str(dst_host.IP()) + ' -p ' + str(port) + 
+             ' -b ' + str(rate) + 'M -i 1 -t 15 ' \
              ' > /home/mininet/Desktop/c3p/' + filename + ' & ')
     
+def cmd_server(host, port):
+    filename = str(host) + 'server' + str(port) + '.out'
+    output_file = '/home/mininet/Desktop/c3p/' + filename
+    cmd = 'nohup iperf3  -s -i 1 -p ' + str(port) + ' > /home/mininet/Desktop/c3p/' + filename + \
+    ' 2>&1 & '
+    host.cmd(cmd)
+
+    # process = host.popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+
+    # while True:
+    #     output_line = process.stdout.readline().decode().strip()
+    #     if output_line:
+    #         print(output_line)
+    #     else:
+    #         print('error')
+
+    #     # 检查主机进程是否已结束
+    #     if process.poll() is not None:
+    #         break
+
+    #     # 延迟1秒
+    #     time.sleep(1)
+
+
 def set_normal_policing(controller, rate):
     port = 's2-eth5'
     cmd_policing_rate = "ovs-vsctl set interface {0} ingress_policing_rate={1}".format(
@@ -121,6 +137,7 @@ def myNetwork():
 
     servers = []
     servers.append(Thread(target=cmd_server, args=(h5, 5015,)))
+
     # servers.append(Thread(target=cmd_server, args=(h6, 5026,)))
     # servers.append(Thread(target=cmd_server, args=(h7, 5017,)))
     # servers.append(Thread(target=cmd_server, args=(h8, 5048,)))
@@ -133,13 +150,15 @@ def myNetwork():
         server.start()
         sleep(0.1)
 
+    
 
-    speed_host12 = 8
-    speed_host34 = 2
+    speed_host12 = 5
+    speed_host34 = 5
     flow_host12 = 'udp'
     flow_host34 = 'udp'
     clients = []
-    clients.append(Thread(target=cmd_client, args=(h1, h5, 5015, flow_host12, speed_host12)))
+    cmd_client(h1, h5, 5015, flow_host12, speed_host12)
+    # clients.append(Thread(target=cmd_client, args=(h1, h5, 5015, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h1, h7, 5017, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h2, h6, 5026, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h2, h8, 5028, flow_host12, speed_host12)))
@@ -152,6 +171,10 @@ def myNetwork():
         client.start()
         sleep(0.1)
 
+    sleep(15.1) # 15.3 is accpetable
+    lost_obj = Lost()
+
+    temp_lost = lost_obj.get_rate()
 
     CLI(net)
 
