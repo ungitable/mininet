@@ -24,7 +24,7 @@ def cmd_client(host, dst_host, port, flow_type, rate):
 
     filename = str(host) + 'client' + str(port) + '.out'
     host.cmd( 'iperf3  ' + flow + ' -c ' + str(dst_host.IP()) + ' -p ' + str(port) + 
-             ' -b ' + str(rate) + 'M -i 1 -t 15 ' \
+             ' -b ' + str(rate) + 'M -i 1 -t 5 ' \
              ' > /home/mininet/Desktop/c3p/' + filename + ' & ')
     
 def cmd_server(host, port):
@@ -133,7 +133,28 @@ def myNetwork():
     net.pingAll()
 
 
-    sleep(0)
+    output = c0.cmd('ovs-vsctl set bridge s2 datapath_type=netdev; \
+                    ovs-vsctl set bridge s2 protocols=OpenFlow13; \
+                    ovs-vsctl set bridge s1 datapath_type=netdev; \
+                    ovs-vsctl set bridge s1 protocols=OpenFlow13; \
+                    \
+                    ovs-ofctl add-meter s2 "meter=2,kbps,burst,band=type=drop,rate=5120,burst_size=5120" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.5,action=meter:2,output:1" -O OpenFlow13; \
+                    \
+                    ovs-ofctl add-meter s2 "meter=3,kbps,burst,band=type=drop,rate=5120,burst_size=1" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.6,action=meter:3,output:2" -O OpenFlow13; \
+                    \
+                    ovs-ofctl add-meter s2 "meter=4,kbps,burst,band=type=drop,rate=5120,burst_size=1" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.7,action=meter:4,output:3" -O OpenFlow13; \
+                    \
+                    ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate=5120,burst_size=1" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,in_port=5,ip,nw_dst=10.0.0.8,action=meter:5,output:4" -O OpenFlow13; \
+                    ')
+    # print(output)
+
+    turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8) # this commmend is incredibly important
+
+    sleep(3.0)
 
     servers = []
     servers.append(Thread(target=cmd_server, args=(h5, 5015,)))
@@ -152,13 +173,13 @@ def myNetwork():
 
     
 
-    speed_host12 = 5
+    speed_host12 = 100
     speed_host34 = 5
     flow_host12 = 'udp'
     flow_host34 = 'udp'
     clients = []
-    cmd_client(h1, h5, 5015, flow_host12, speed_host12)
-    # clients.append(Thread(target=cmd_client, args=(h1, h5, 5015, flow_host12, speed_host12)))
+    # cmd_client(h1, h5, 5015, flow_host12, speed_host12)
+    clients.append(Thread(target=cmd_client, args=(h1, h5, 5015, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h1, h7, 5017, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h2, h6, 5026, flow_host12, speed_host12)))
     # clients.append(Thread(target=cmd_client, args=(h2, h8, 5028, flow_host12, speed_host12)))
@@ -171,10 +192,19 @@ def myNetwork():
         client.start()
         sleep(0.1)
 
-    sleep(15.1) # 15.3 is accpetable
+    sleep(5.1) # 10.1 is accpetable
     lost_obj = Lost()
 
-    temp_lost = lost_obj.get_rate()
+    temp_lost = lost_obj.get_rate(h5, 5015)
+    print(temp_lost)
+
+    output = c0.cmd('ovs-ofctl mod-meter s2 "meter=2,kbps,burst,band=type=drop,rate=51200,burst_size=0" -O OpenFlow13;')
+
+    cmd_client(h1, h5, 5015, flow_host12, speed_host12)
+    sleep(5.1)
+    temp_lost = lost_obj.get_rate(h5, 5015)
+    print(temp_lost)
+
 
     CLI(net)
 
