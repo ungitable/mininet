@@ -34,23 +34,6 @@ def cmd_server(host, port):
     ' & '
     host.cmd(cmd)
 
-    # process = host.popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-
-    # while True:
-    #     output_line = process.stdout.readline().decode().strip()
-    #     if output_line:
-    #         print(output_line)
-    #     else:
-    #         print('error')
-
-    #     # 检查主机进程是否已结束
-    #     if process.poll() is not None:
-    #         break
-
-    #     # 延迟1秒
-    #     time.sleep(1)
-
-
 def set_normal_policing(controller, rate):
     port = 's2-eth5'
     cmd_policing_rate = "ovs-vsctl set interface {0} ingress_policing_rate={1}".format(
@@ -149,6 +132,7 @@ def myNetwork():
     directory = '/home/mininet/Desktop/c3p'
     clear_directory(directory)
 
+
     output = c0.cmd('ovs-vsctl set bridge s1 datapath_type=netdev; \
                     ovs-vsctl set bridge s1 protocols=OpenFlow13; \
                     ovs-vsctl set bridge s2 datapath_type=netdev; \
@@ -166,70 +150,39 @@ def myNetwork():
                     ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
                     ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.8,action=meter:5,output:4" -O OpenFlow13; \
                     \
+                    ovs-ofctl add-meter s2 "meter=6,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.9,action=meter:6,output:6" -O OpenFlow13; \
+                    \
+                    ovs-ofctl add-meter s2 "meter=7,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.10,action=meter:7,output:7" -O OpenFlow13; \
+                   \
+                    ovs-ofctl add-meter s2 "meter=8,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.11,action=meter:8,output:8" -O OpenFlow13; \
+                   \
+                    ovs-ofctl add-meter s2 "meter=9,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
+                    ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.12,action=meter:9,output:9" -O OpenFlow13; \
+                    \
                     '.format(10*1024))
     print(output)
 
-
-    # output = c0.cmd('ovs-vsctl set bridge s1 datapath_type=netdev; \
-    #                 ovs-vsctl set bridge s1 protocols=OpenFlow13; \
-    #                 ovs-vsctl set bridge s2 datapath_type=netdev; \
-    #                 ovs-vsctl set bridge s2 protocols=OpenFlow13; \
-    #                 \
-    #                 ovs-ofctl add-meter s2 "meter=2,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
-    #                 ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.9,action=meter:2,output:5" -O OpenFlow13; \
-    #                 \
-    #                 ovs-ofctl add-meter s2 "meter=3,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
-    #                 ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.10,action=meter:3,output:6" -O OpenFlow13; \
-    #                 \
-    #                 ovs-ofctl add-meter s2 "meter=4,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
-    #                 ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.11,action=meter:4,output:7" -O OpenFlow13; \
-    #                 \
-    #                 ovs-ofctl add-meter s2 "meter=5,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
-    #                 ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.12,action=meter:5,output:8" -O OpenFlow13; \
-    #                 \
-    #                 '.format(10*1000))
-    # print(output)
-
-
-
-    # output = c0.cmd('ovs-ofctl dump-meters s2')
-    # print(output)
 
     turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12) # this commmend is incredibly important
 
     sleep(3.0)
 
     servers = []
-    # servers.append(Thread(target=cmd_server, args=(h5, 5105)))
-    # servers.append(Thread(target=cmd_server, args=(h6, 5106)))
-    # servers.append(Thread(target=cmd_server, args=(h9, 5109)))
-    # servers.append(Thread(target=cmd_server, args=(h10, 5110)))
-    # servers.append(Thread(target=cmd_server, args=(h5, 5305)))
-    # servers.append(Thread(target=cmd_server, args=(h6, 5306)))
-    # servers.append(Thread(target=cmd_server, args=(h9, 5309)))
-    # servers.append(Thread(target=cmd_server, args=(h10, 5310)))
 
-    # servers.append(Thread(target=cmd_server, args=(h7, 5207)))
-    # servers.append(Thread(target=cmd_server, args=(h8, 5208)))
-    # servers.append(Thread(target=cmd_server, args=(h11, 5211)))
-    # servers.append(Thread(target=cmd_server, args=(h12, 5212)))
-    # servers.append(Thread(target=cmd_server, args=(h7, 5407)))
-    # servers.append(Thread(target=cmd_server, args=(h8, 5408)))
-    # servers.append(Thread(target=cmd_server, args=(h11, 5411)))
-    # servers.append(Thread(target=cmd_server, args=(h12, 5412)))
 
-    # case 1
     servers.append(Thread(target=cmd_server, args=(h5, 5105)))
     servers.append(Thread(target=cmd_server, args=(h6, 5206)))
     servers.append(Thread(target=cmd_server, args=(h7, 5307)))
     servers.append(Thread(target=cmd_server, args=(h8, 5408)))
 
-    # servers.append(Thread(target=cmd_server, args=(h9, 5109)))
-    # servers.append(Thread(target=cmd_server, args=(h10, 5210)))
-    # servers.append(Thread(target=cmd_server, args=(h11, 5311)))
-    # servers.append(Thread(target=cmd_server, args=(h12, 5412)))
+    servers.append(Thread(target=cmd_server, args=(h9, 5109)))
+    servers.append(Thread(target=cmd_server, args=(h10, 5210)))
+    servers.append(Thread(target=cmd_server, args=(h11, 5311)))
+    servers.append(Thread(target=cmd_server, args=(h12, 5412)))
     
-
 
     for server in servers:
         server.start()
@@ -244,54 +197,32 @@ def myNetwork():
     flow_host34 = 'udp'
 
     clients = []
-    # cmd_client(h1, h5, 5015, flow_host12, speed_host12)
-    # clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h3, h5, 5305, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h3, h6, 5306, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h1, h10, 5110, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h3, h9, 5309, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h3, h10, 5310, flow_host34, speed_host34)))
 
-    # clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h4, h7, 5407, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h2, h11, 5211, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h2, h12, 5212, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h4, h11, 5411, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h4, h12, 5412, flow_host34, speed_host34)))
-
-
-    # case 1
     clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
     clients.append(Thread(target=cmd_client, args=(h3, h7, 5307, flow_host34, speed_host34)))
     clients.append(Thread(target=cmd_client, args=(h2, h6, 5206, flow_host12, speed_host12)))
     clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
 
-    # clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h3, h11, 5311, flow_host34, speed_host34)))
-    # clients.append(Thread(target=cmd_client, args=(h2, h10, 5210, flow_host12, speed_host12)))
-    # clients.append(Thread(target=cmd_client, args=(h4, h12, 5412, flow_host34, speed_host34)))
+    clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
+    clients.append(Thread(target=cmd_client, args=(h3, h11, 5311, flow_host34, speed_host34)))
+    clients.append(Thread(target=cmd_client, args=(h2, h10, 5210, flow_host12, speed_host12)))
+    clients.append(Thread(target=cmd_client, args=(h4, h12, 5412, flow_host34, speed_host34)))
 
 
     for client in clients:
         client.start()
         sleep(0.03) 
 
-    # print('okay')
-    # sleep(100)
     
     lost_obj = Lost()
     losts = []
 
     limits = []
-    for i in range(4):
+    for i in range(8):
         limits.append(10.0)
 
     limit = []
-    for i in range(4):
+    for i in range(8):
         limit.append(10.0)
 
     coefficient = 1.5
@@ -304,78 +235,41 @@ def myNetwork():
         # get lost
         # format: lost / total
 
-        # lost5105, total5105 = lost_obj.get_rate(h5, 5105)
-        # lost5106, total5106 = lost_obj.get_rate(h6, 5106)
-        # lost5109, total5109 = lost_obj.get_rate(h9, 5109)
-        # lost5110, total5110 = lost_obj.get_rate(h10, 5110)
-        # lost5305, total5305 = lost_obj.get_rate(h5, 5305)
-        # lost5306, total5306 = lost_obj.get_rate(h6, 5306)
-        # lost5309, total5309 = lost_obj.get_rate(h9, 5309)
-        # lost5310, total5310 = lost_obj.get_rate(h10, 5310)
-
-        # lost5207, total5207 = lost_obj.get_rate(h7, 5207)
-        # lost5208, total5208 = lost_obj.get_rate(h8, 5208)
-        # lost5211, total5211 = lost_obj.get_rate(h11, 5211)
-        # lost5212, total5212 = lost_obj.get_rate(h12, 5212)
-        # lost5407, total5407 = lost_obj.get_rate(h7, 5407)
-        # lost5408, total5408 = lost_obj.get_rate(h8, 5408)
-        # lost5411, total5411 = lost_obj.get_rate(h11, 5411)
-        # lost5412, total5412 = lost_obj.get_rate(h12, 5412)
-
-        
-        # lost_rate_h5 = (lost5105 + lost5305) / (total5105 + total5305)
-        # lost_rate_h6 = (lost5106 + lost5306) / (total5106 + total5306)
-        # lost_rate_h9 = (lost5109 + lost5309) / (total5109 + total5309)
-        # lost_rate_h10 = (lost5110 + lost5310) / (total5110 + total5310)
-
-        # lost_rate_h7 = (lost5207 + lost5407) / (total5207 + total5407)
-        # lost_rate_h8 = (lost5208 + lost5408) / (total5208 + total5408)
-        # lost_rate_h11 = (lost5211 + lost5411) / (total5211 + total5411)
-        # lost_rate_h12 = (lost5212 + lost5412) / (total5212 + total5412)
-
-
         #case 1
         lost5105, total5105 = lost_obj.get_rate(h5, 5105)
-        # lost5109, total5109 = lost_obj.get_rate(h9, 5109)
+        lost5109, total5109 = lost_obj.get_rate(h9, 5109)
         lost5206, total5206 = lost_obj.get_rate(h6, 5206)
-        # lost5210, total5210 = lost_obj.get_rate(h10, 5210)
+        lost5210, total5210 = lost_obj.get_rate(h10, 5210)
         lost5307, total5307 = lost_obj.get_rate(h7, 5307)
-        # lost5311, total5311 = lost_obj.get_rate(h11, 5311)
+        lost5311, total5311 = lost_obj.get_rate(h11, 5311)
         lost5408, total5408 = lost_obj.get_rate(h8, 5408)
-        # lost5412, total5412 = lost_obj.get_rate(h12, 5412)
+        lost5412, total5412 = lost_obj.get_rate(h12, 5412)
 
-        if i > 6:
-            one_piece = total5105 / 4
-            total5105 = total5105 - one_piece
-            lost5105 = lost5105 - one_piece
+        if i > 8:
+            one_piece = total5109 / 4
+            total5109 = total5109 - one_piece
+            lost5109 = lost5109 - one_piece
 
         lost_rate_h5 = lost5105 / total5105
         lost_rate_h6 = lost5206 / total5206
         lost_rate_h7 = lost5307 / total5307
         lost_rate_h8 = lost5408 / total5408
-        # lost_rate_h9 = lost5109 / total5109
-        # lost_rate_h10 = lost5210 / total5210
-        # lost_rate_h11 = lost5311 / total5311
-        # lost_rate_h12 = lost5412 / total5412
+        lost_rate_h9 = lost5109 / total5109
+        lost_rate_h10 = lost5210 / total5210
+        lost_rate_h11 = lost5311 / total5311
+        lost_rate_h12 = lost5412 / total5412
 
 
-
-
-        # temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
-        #              lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
-        # print(temp_list)
-        # losts.extend(temp_list)
-        
-        # # update limiting rate
-        # lost_list = [
-        #              lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
-
-        temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,]
+        temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
+                     lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
         losts.extend(temp_list)
         
+
         # update limiting rate
-        lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,]
+        lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
+                     lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
+        
 
         # use c3p strategy independently
         # for hosts ranging from h5 to h8
@@ -386,12 +280,12 @@ def myNetwork():
             limit[h] = limit[h] + coefficient * lost_sum
 
         # for hosts ranging from h9 to h12
-        # for h in range(4, 8):
-        #     t = h - 4
-        #     left = (t+4-1) % 4 + 4
-        #     right = (t+1) % 4 + 4
-        #     lost_sum = lost_list[h] * 2 - lost_list[left] - lost_list[right]
-        #     limit[h] = limit[h] + coefficient * lost_sum
+        for h in range(4, 8):
+            t = h - 4
+            left = (t+4-1) % 4 + 4
+            right = (t+1) % 4 + 4
+            lost_sum = lost_list[h] * 2 - lost_list[left] - lost_list[right]
+            limit[h] = limit[h] + coefficient * lost_sum
      
         print(limit)
         print()
@@ -400,7 +294,7 @@ def myNetwork():
         
         # update limitation of flow speed in hosts ranging from h5 to h8
 
-        for j in range(4):
+        for j in range(8):
             command = 'ovs-ofctl mod-meter s2 "meter={},kbps,burst,band=type=drop,rate={},burst_size={}" -O OpenFlow13; \
                         '.format(j+2, int(limit[j]*1024), 100)
             
@@ -409,7 +303,7 @@ def myNetwork():
 
 
         # limit the speed of elephant flows
-        if i == 6:
+        if i == 8:
             print('elephant flow limiting begins')
             '''
             h1 -> h9
@@ -418,7 +312,7 @@ def myNetwork():
             h2 -> h12
             '''
             output = c0.cmd('ovs-ofctl add-meter s1 "meter=20,kbps,burst,band=type=drop,rate={0},burst_size=100" -O OpenFlow13; \
-                        ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.1,nw_dst=10.0.0.5,action=meter:20,output:5" -O OpenFlow13; \
+                        ovs-ofctl add-flow s1 "table=0,priority=10,ip,nw_src=10.0.0.1,nw_dst=10.0.0.9,action=meter:20,output:5" -O OpenFlow13; \
                         '.format(15*1024))
             print(output)
 
@@ -426,23 +320,24 @@ def myNetwork():
         clients = []
         if i < 5:
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
-            # clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
+            clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
         else:
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, 20)))
-            # clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, 20)))
+            clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, 20)))
 
         clients.append(Thread(target=cmd_client, args=(h3, h7, 5307, flow_host34, speed_host34)))
         clients.append(Thread(target=cmd_client, args=(h2, h6, 5206, flow_host12, speed_host12)))
         clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
 
+        clients.append(Thread(target=cmd_client, args=(h3, h11, 5311, flow_host34, speed_host34)))
+        clients.append(Thread(target=cmd_client, args=(h2, h10, 5210, flow_host12, speed_host12)))
+        clients.append(Thread(target=cmd_client, args=(h4, h12, 5412, flow_host34, speed_host34)))
 
 
         for client in clients:
             client.start()
             sleep(0.03) # cannot set sleeptime = 0, idealy 0.1s
 
-    # print(losts)
-    # print(limits)
 
     CLI(net)
 
