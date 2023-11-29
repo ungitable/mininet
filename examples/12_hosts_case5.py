@@ -2,18 +2,16 @@
 
 import os
 from time import sleep
-from mininet.examples.popen import monitorhosts
+import numpy as np
 from mininet.net import Mininet
-from mininet.node import Controller, RemoteController, OVSController
-from mininet.node import CPULimitedHost, Host, Node
-from mininet.node import OVSKernelSwitch, UserSwitch
-from mininet.node import IVSSwitch
+from mininet.node import RemoteController
+from mininet.node import Host
+from mininet.node import OVSKernelSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from subprocess import call
 from threading import Thread
+import matplotlib.pyplot as plt
 from get_lost import Lost
-import subprocess
 
 
 def cmd_client(host, dst_host, port, flow_type, rate):
@@ -33,13 +31,6 @@ def cmd_server(host, port):
     cmd = 'iperf3  -s -i 1 -p ' + str(port) + ' >> /home/mininet/Desktop/c3p/' + filename + \
     ' & '
     host.cmd(cmd)
-
-
-def set_normal_policing(controller, rate):
-    port = 's2-eth5'
-    cmd_policing_rate = "ovs-vsctl set interface {0} ingress_policing_rate={1}".format(
-        port, rate)
-    controller.cmd(cmd_policing_rate)
 
 def turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12):
     h1.cmd('ethtool -K h1-eth0 tx off')
@@ -182,7 +173,6 @@ def myNetwork():
     servers.append(Thread(target=cmd_server, args=(h11, 5011)))
     servers.append(Thread(target=cmd_server, args=(h12, 5012)))
     
-    
     for server in servers:
         server.start()
         sleep(0.1)
@@ -202,7 +192,6 @@ def myNetwork():
     clients.append(Thread(target=cmd_client, args=(h1, h11, 5011, flow_host, speed_host)))
     clients.append(Thread(target=cmd_client, args=(h1, h12, 5012, flow_host, speed_host)))
 
-
     for client in clients:
         client.start()
         sleep(0.03) 
@@ -211,18 +200,20 @@ def myNetwork():
     lost_obj = Lost()
     losts = []
 
-    limits = []
-    for i in range(8):
-        limits.append(10.0)
-
     limit = []
     for i in range(8):
         limit.append(10.0)
 
-    coefficient = 2
+    limits = []
+    res_limit = []
+    for l in limit:
+        res_limit.append(l)
+    limits.append(res_limit)
+
+    coefficient = 1
 
 
-    for i in range(1, 30):
+    for i in range(1, 31):
 
         sleep(6.0) # x.1 is accpetable
 
@@ -264,7 +255,7 @@ def myNetwork():
         temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
                      lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
-        losts.extend(temp_list)
+        losts.append(temp_list)
         
         # update limiting rate
         lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
@@ -282,7 +273,10 @@ def myNetwork():
      
         print(limit)
         print()
-        limits.extend(limit)
+        res_limit = []
+        for l in limit:
+            res_limit.append(l)
+        limits.append(res_limit)
         
         
         # update limitation of flow speed in hosts ranging from h5 to h8
@@ -335,8 +329,78 @@ def myNetwork():
     # print(losts)
     # print(limits)
 
-    CLI(net)
+    print('experiment ended.')
 
+
+    # expand limits 10 times
+    for i in range(len(limits)):
+        for j in range(len(limits[i])):
+            limits[i][j] = limits[i][j] * 10
+
+
+    # calculate avg & std
+    avg = []
+    std = []
+
+    for k in range(len(limits)):
+        arr = limits[k]
+
+        arr_mean = np.mean(arr)
+        arr_std = np.std(arr)
+        # print(arr, arr_mean, arr_std)
+
+        avg.append(arr_mean)
+        std.append(arr_std)
+
+    print('avg:', avg)
+    print('std:', std)
+
+
+    # plot 8 hosts limits
+    num_nodes = len(limits[0])
+    colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
+
+    plt.figure(figsize=(10, 6))
+
+    for i in range(num_nodes):
+        node_values = [sublist[i] for sublist in limits]
+        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+1))
+
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Node Values')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('/home/mininet/Desktop/pic/case5_plot1.png')
+    plt.show()
+        
+
+    # plot JFI
+    jfi = []
+
+    for k in range(len(losts)):
+        arr = losts[k][1:]
+
+        numerator = np.sum(arr) ** 2
+        denominator = len(arr) * sum([x**2 for x in arr])
+        jfi.append(numerator/denominator)
+
+    print('jfi:', jfi)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(jfi) + 1), jfi, color='blue', label='Group')
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Group Values')
+    plt.legend()
+
+    plt.savefig('/home/mininet/Desktop/pic/case5_plot2.png')
+    plt.show()
+
+
+    CLI(net)
+    
     net.stop()
 
     # clear the network topology, switches and hosts 

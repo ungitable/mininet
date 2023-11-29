@@ -2,7 +2,6 @@
 
 import os
 from time import sleep
-
 import numpy as np
 from mininet.net import Mininet
 from mininet.node import RemoteController
@@ -186,7 +185,6 @@ def myNetwork():
     flow_host34 = 'udp'
 
     clients = []
-
     clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
     clients.append(Thread(target=cmd_client, args=(h3, h7, 5307, flow_host34, speed_host34)))
     clients.append(Thread(target=cmd_client, args=(h2, h6, 5206, flow_host12, speed_host12)))
@@ -196,7 +194,6 @@ def myNetwork():
     clients.append(Thread(target=cmd_client, args=(h3, h11, 5311, flow_host34, speed_host34)))
     clients.append(Thread(target=cmd_client, args=(h2, h10, 5210, flow_host12, speed_host12)))
     clients.append(Thread(target=cmd_client, args=(h4, h12, 5412, flow_host34, speed_host34)))
-
 
     for client in clients:
         client.start()
@@ -372,7 +369,7 @@ def myNetwork():
     num_nodes = len(limits[0])
     colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
 
-    plt.figure(figsize=(16, 6))
+    plt.figure(figsize=(10, 6))
 
     for i in range(num_nodes):
         node_values = [sublist[i] for sublist in limits]
@@ -409,7 +406,7 @@ def myNetwork():
     print('jfi1:', jfi1)
     print('jfi2:', jfi2)
 
-    plt.figure(figsize=(16, 6))
+    plt.figure(figsize=(10, 6))
 
     plt.plot(range(1, len(jfi1) + 1), jfi1, color='blue', label='Group 1')
     plt.plot(range(1, len(jfi2) + 1), jfi2, color='red', label='Group 2')

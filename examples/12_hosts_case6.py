@@ -2,18 +2,16 @@
 
 import os
 from time import sleep
-from mininet.examples.popen import monitorhosts
+import numpy as np
 from mininet.net import Mininet
-from mininet.node import Controller, RemoteController, OVSController
-from mininet.node import CPULimitedHost, Host, Node
-from mininet.node import OVSKernelSwitch, UserSwitch
-from mininet.node import IVSSwitch
+from mininet.node import RemoteController
+from mininet.node import Host
+from mininet.node import OVSKernelSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from subprocess import call
 from threading import Thread
+import matplotlib.pyplot as plt
 from get_lost import Lost
-import subprocess
 
 
 def cmd_client(host, dst_host, port, flow_type, rate):
@@ -33,13 +31,6 @@ def cmd_server(host, port):
     cmd = 'iperf3  -s -i 1 -p ' + str(port) + ' >> /home/mininet/Desktop/c3p/' + filename + \
     ' & '
     host.cmd(cmd)
-
-
-def set_normal_policing(controller, rate):
-    port = 's2-eth5'
-    cmd_policing_rate = "ovs-vsctl set interface {0} ingress_policing_rate={1}".format(
-        port, rate)
-    controller.cmd(cmd_policing_rate)
 
 def turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12):
     h1.cmd('ethtool -K h1-eth0 tx off')
@@ -176,7 +167,6 @@ def myNetwork():
     servers.append(Thread(target=cmd_server, args=(h6, 5006)))
     servers.append(Thread(target=cmd_server, args=(h7, 5007)))
     servers.append(Thread(target=cmd_server, args=(h8, 5008)))
-
     servers.append(Thread(target=cmd_server, args=(h9, 5009)))
     servers.append(Thread(target=cmd_server, args=(h10, 5010)))
     servers.append(Thread(target=cmd_server, args=(h11, 5011)))
@@ -186,12 +176,10 @@ def myNetwork():
     servers.append(Thread(target=cmd_server, args=(h6, 5206)))
     servers.append(Thread(target=cmd_server, args=(h7, 5207)))
     servers.append(Thread(target=cmd_server, args=(h8, 5208)))
-
     servers.append(Thread(target=cmd_server, args=(h9, 5209)))
     servers.append(Thread(target=cmd_server, args=(h10, 5210)))
     servers.append(Thread(target=cmd_server, args=(h11, 5211)))
     servers.append(Thread(target=cmd_server, args=(h12, 5212)))
-    
     
     for server in servers:
         server.start()
@@ -207,7 +195,6 @@ def myNetwork():
     clients.append(Thread(target=cmd_client, args=(h1, h6, 5006, flow_host, speed_host1)))
     clients.append(Thread(target=cmd_client, args=(h1, h7, 5007, flow_host, speed_host1)))
     clients.append(Thread(target=cmd_client, args=(h1, h8, 5008, flow_host, speed_host1)))
-
     clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, speed_host1)))
     clients.append(Thread(target=cmd_client, args=(h1, h10, 5010, flow_host, speed_host1)))
     clients.append(Thread(target=cmd_client, args=(h1, h11, 5011, flow_host, speed_host1)))
@@ -217,12 +204,10 @@ def myNetwork():
     clients.append(Thread(target=cmd_client, args=(h2, h6, 5206, flow_host, speed_host2)))
     clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host, speed_host2)))
     clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host, speed_host2)))
-
     clients.append(Thread(target=cmd_client, args=(h2, h9, 5209, flow_host, speed_host2)))
     clients.append(Thread(target=cmd_client, args=(h2, h10, 5210, flow_host, speed_host2)))
     clients.append(Thread(target=cmd_client, args=(h2, h11, 5211, flow_host, speed_host2)))
     clients.append(Thread(target=cmd_client, args=(h2, h12, 5212, flow_host, speed_host2)))
-
 
     for client in clients:
         client.start()
@@ -232,18 +217,20 @@ def myNetwork():
     lost_obj = Lost()
     losts = []
 
-    limits = []
-    for i in range(8):
-        limits.append(10.0)
-
     limit = []
     for i in range(8):
         limit.append(10.0)
 
-    coefficient = 2
+    limits = []
+    res_limit = []
+    for l in limit:
+        res_limit.append(l)
+    limits.append(res_limit)
+
+    coefficient = 1
 
 
-    for i in range(1, 30):
+    for i in range(1, 31):
 
         sleep(6.0) # x.1 is accpetable
 
@@ -254,7 +241,6 @@ def myNetwork():
         lost5006, total5006 = lost_obj.get_rate(h6, 5006)
         lost5007, total5007 = lost_obj.get_rate(h7, 5007)
         lost5008, total5008 = lost_obj.get_rate(h8, 5008)
-
         lost5009, total5009 = lost_obj.get_rate(h9, 5009)
         lost5010, total5010 = lost_obj.get_rate(h10, 5010)
         lost5011, total5011 = lost_obj.get_rate(h11, 5011)
@@ -264,7 +250,6 @@ def myNetwork():
         lost5206, total5206 = lost_obj.get_rate(h6, 5206)
         lost5207, total5207 = lost_obj.get_rate(h7, 5207)
         lost5208, total5208 = lost_obj.get_rate(h8, 5208)
-
         lost5209, total5209 = lost_obj.get_rate(h9, 5209)
         lost5210, total5210 = lost_obj.get_rate(h10, 5210)
         lost5211, total5211 = lost_obj.get_rate(h11, 5211)
@@ -295,7 +280,7 @@ def myNetwork():
         temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
                      lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
-        losts.extend(temp_list)
+        losts.append(temp_list)
         
         # update limiting rate
         lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
@@ -313,7 +298,10 @@ def myNetwork():
      
         print(limit)
         print()
-        limits.extend(limit)
+        res_limit = []
+        for l in limit:
+            res_limit.append(l)
+        limits.append(res_limit)
         
         
         # update limitation of flow speed in hosts ranging from h5 to h8
@@ -374,8 +362,75 @@ def myNetwork():
             client.start()
             sleep(0.03) # cannot set sleeptime = 0, idealy 0.1s
 
-    # print(losts)
-    # print(limits)
+    print('experiment ended.')
+
+
+    # expand limits 10 times
+    for i in range(len(limits)):
+        for j in range(len(limits[i])):
+            limits[i][j] = limits[i][j] * 10
+
+
+    # calculate avg & std
+    avg = []
+    std = []
+
+    for k in range(len(limits)):
+        arr = limits[k]
+
+        arr_mean = np.mean(arr)
+        arr_std = np.std(arr)
+        # print(arr, arr_mean, arr_std)
+
+        avg.append(arr_mean)
+        std.append(arr_std)
+
+    print('avg:', avg)
+    print('std:', std)
+
+
+    # plot 8 hosts limits
+    num_nodes = len(limits[0])
+    colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
+
+    plt.figure(figsize=(10, 6))
+
+    for i in range(num_nodes):
+        node_values = [sublist[i] for sublist in limits]
+        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+1))
+
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Node Values')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('/home/mininet/Desktop/pic/case6_plot1.png')
+    plt.show()
+        
+
+    # plot JFI
+    jfi = []
+
+    for k in range(len(losts)):
+        arr = losts[k][1:]
+
+        numerator = np.sum(arr) ** 2
+        denominator = len(arr) * sum([x**2 for x in arr])
+        jfi.append(numerator/denominator)
+
+    print('jfi:', jfi)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(jfi) + 1), jfi, color='blue', label='Group')
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Group Values')
+    plt.legend()
+
+    plt.savefig('/home/mininet/Desktop/pic/case6_plot2.png')
+    plt.show()
+        
 
     CLI(net)
 
