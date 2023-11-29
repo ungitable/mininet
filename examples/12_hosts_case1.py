@@ -2,23 +2,21 @@
 
 import os
 from time import sleep
-from mininet.examples.popen import monitorhosts
+
+import numpy as np
 from mininet.net import Mininet
-from mininet.node import Controller, RemoteController, OVSController
-from mininet.node import CPULimitedHost, Host, Node
-from mininet.node import OVSKernelSwitch, UserSwitch
-from mininet.node import IVSSwitch
+from mininet.node import RemoteController
+from mininet.node import Host
+from mininet.node import OVSKernelSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from subprocess import call
 from threading import Thread
+import matplotlib.pyplot as plt
 from get_lost import Lost
-import subprocess
 
 
 def cmd_client(host, dst_host, port, flow_type, rate):
     flow = ''
-    
     if flow_type == 'udp':
         flow = '-u'
 
@@ -33,12 +31,6 @@ def cmd_server(host, port):
     cmd = 'iperf3  -s -i 1 -p ' + str(port) + ' >> /home/mininet/Desktop/c3p/' + filename + \
     ' & '
     host.cmd(cmd)
-
-def set_normal_policing(controller, rate):
-    port = 's2-eth5'
-    cmd_policing_rate = "ovs-vsctl set interface {0} ingress_policing_rate={1}".format(
-        port, rate)
-    controller.cmd(cmd_policing_rate)
 
 def turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12):
     h1.cmd('ethtool -K h1-eth0 tx off')
@@ -79,7 +71,6 @@ def myNetwork():
                       port=6633)
 
     # info( '*** Add switches\n')
-    # UserSwitch, OVSKernelSwitch
     s1 = net.addSwitch('s1', cls=OVSKernelSwitch, dpid='0000000000000001')
     s2 = net.addSwitch('s2', cls=OVSKernelSwitch, dpid='0000000000000002')
 
@@ -103,7 +94,7 @@ def myNetwork():
     net.addLink(s1, h2)
     net.addLink(s1, h3)
     net.addLink(s1, h4)
-    net.addLink(s2, h5) # net.addLink(s2, h5, cls=TCLink, bw = 10)
+    net.addLink(s2, h5) 
     net.addLink(s2, h6)
     net.addLink(s2, h7)
     net.addLink(s2, h8)
@@ -132,6 +123,8 @@ def myNetwork():
     directory = '/home/mininet/Desktop/c3p'
     clear_directory(directory)
 
+
+    turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12) # this commmend is incredibly important
 
     output = c0.cmd('ovs-vsctl set bridge s1 datapath_type=netdev; \
                     ovs-vsctl set bridge s1 protocols=OpenFlow13; \
@@ -163,16 +156,12 @@ def myNetwork():
                     ovs-ofctl add-flow s2 "table=0,priority=5,ip,nw_dst=10.0.0.12,action=meter:9,output:9" -O OpenFlow13; \
                     \
                     '.format(10*1024))
-    print(output)
+    # print(output)
 
-
-    turn_tx_off(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12) # this commmend is incredibly important
 
     sleep(3.0)
 
     servers = []
-
-
     servers.append(Thread(target=cmd_server, args=(h5, 5105)))
     servers.append(Thread(target=cmd_server, args=(h6, 5206)))
     servers.append(Thread(target=cmd_server, args=(h7, 5307)))
@@ -217,15 +206,17 @@ def myNetwork():
     lost_obj = Lost()
     losts = []
 
-    limits = []
-    for i in range(8):
-        limits.append(10.0)
-
     limit = []
     for i in range(8):
         limit.append(10.0)
 
-    coefficient = 1.5
+    limits = []
+    res_limit = []
+    for l in limit:
+        res_limit.append(l)
+    limits.append(res_limit)
+
+    coefficient = 1
 
 
     for i in range(1, 31):
@@ -263,7 +254,7 @@ def myNetwork():
         temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
                      lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
-        losts.extend(temp_list)
+        losts.append(temp_list)
         
 
         # update limiting rate
@@ -289,7 +280,10 @@ def myNetwork():
      
         print(limit)
         print()
-        limits.extend(limit)
+        res_limit = []
+        for l in limit:
+            res_limit.append(l)
+        limits.append(res_limit)
         
         
         # update limitation of flow speed in hosts ranging from h5 to h8
@@ -338,7 +332,97 @@ def myNetwork():
             client.start()
             sleep(0.03) # cannot set sleeptime = 0, idealy 0.1s
 
+    print('experiment ended.')
 
+
+    # expand limits 10 times
+    for i in range(len(limits)):
+        for j in range(len(limits[i])):
+            limits[i][j] = limits[i][j] * 10
+
+
+    # calculate avg & std
+    avg1 = []
+    std1 = []
+    avg2 = []
+    std2 = []
+
+    for k in range(len(limits)):
+        arr1 = limits[k][0:4]
+        arr2 = limits[k][4:]
+
+        arr1_mean = np.mean(arr1)
+        arr1_std = np.std(arr1)
+        arr2_mean = np.mean(arr2)
+        arr2_std = np.std(arr2)
+        # print(arr, arr_mean, arr_std)
+
+        avg1.append(arr1_mean)
+        std1.append(arr1_std)
+        avg2.append(arr2_mean)
+        std2.append(arr2_std)
+
+    print('avg1:', avg1)
+    print('std1:', std1)
+    print('avg2:', avg2)
+    print('std2:', std2)
+
+
+    # plot 8 hosts limits
+    num_nodes = len(limits[0])
+    colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
+
+    plt.figure(figsize=(16, 6))
+
+    for i in range(num_nodes):
+        node_values = [sublist[i] for sublist in limits]
+        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+1))
+
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Node Values')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('/home/mininet/Desktop/pic/case1_plot1.png')
+    plt.show()
+        
+
+    # plot JFI
+    jfi1 = []
+    jfi2 = []
+
+    for k in range(len(losts)):
+        arr1 = losts[k][1:5]
+        arr2 = losts[k][5:]
+
+        # for group1
+        numerator = np.sum(arr1) ** 2
+        denominator = len(arr1) * sum([x**2 for x in arr1])
+        jfi1.append(numerator/denominator)
+
+        # for group2
+        numerator = np.sum(arr2) ** 2
+        denominator = len(arr2) * sum([x**2 for x in arr2])
+        jfi2.append(numerator/denominator)
+
+    print('jfi1:', jfi1)
+    print('jfi2:', jfi2)
+
+    plt.figure(figsize=(16, 6))
+
+    plt.plot(range(1, len(jfi1) + 1), jfi1, color='blue', label='Group 1')
+    plt.plot(range(1, len(jfi2) + 1), jfi2, color='red', label='Group 2')
+
+    plt.xlabel('Rounds')
+    plt.ylabel('Values')
+    plt.title('Group 1 and Group 2 Values')
+    plt.legend()
+
+    plt.savefig('/home/mininet/Desktop/pic/case1_plot2.png')
+    plt.show()
+
+    
     CLI(net)
 
     net.stop()
