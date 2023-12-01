@@ -26,13 +26,15 @@ class Lost( ):
             second_number = 0.0
         return first_number, second_number
     
-    def get_speed(line):
+    def get_speed(self, line):
         unit_match = re.search(r'(Kbits/sec|Mbits/sec)', line)
-
+        unit = ''
+        
         if unit_match:
             unit = unit_match.group(1)
         else:
-            print('units of speed matching error')
+            return 0.0
+            # print('units of speed matching error')
 
         if unit == 'Kbits/sec':
             result = re.search(r'\b(\d+)\s+Kbits/sec\b', line)
@@ -75,7 +77,7 @@ class Lost( ):
             # fpr instance, 1.37 Mbits/sec
             t_speed = self.get_speed(line)
 
-            if t_speed >= 0:
+            if t_speed > 0:
                 speed_list.append(t_speed)
 
         # only take middle 3-second interval

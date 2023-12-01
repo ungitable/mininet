@@ -213,10 +213,12 @@ def myNetwork():
         res_limit.append(l)
     limits.append(res_limit)
 
+    speeds = []
+
     coefficient = 1
 
 
-    for i in range(1, 31):
+    for i in range(1, 61):
 
         sleep(6.0) # x.1 is accpetable
 
@@ -224,14 +226,14 @@ def myNetwork():
         # format: lost / total
 
         #case 1
-        lost5105, total5105 = lost_obj.get_rate(h5, 5105)
-        lost5109, total5109 = lost_obj.get_rate(h9, 5109)
-        lost5206, total5206 = lost_obj.get_rate(h6, 5206)
-        lost5210, total5210 = lost_obj.get_rate(h10, 5210)
-        lost5307, total5307 = lost_obj.get_rate(h7, 5307)
-        lost5311, total5311 = lost_obj.get_rate(h11, 5311)
-        lost5408, total5408 = lost_obj.get_rate(h8, 5408)
-        lost5412, total5412 = lost_obj.get_rate(h12, 5412)
+        lost5105, total5105, speed5105 = lost_obj.get_rate(h5, 5105)
+        lost5109, total5109, speed5109 = lost_obj.get_rate(h9, 5109)
+        lost5206, total5206, speed5206 = lost_obj.get_rate(h6, 5206)
+        lost5210, total5210, speed5210 = lost_obj.get_rate(h10, 5210)
+        lost5307, total5307, speed5307 = lost_obj.get_rate(h7, 5307)
+        lost5311, total5311, speed5311 = lost_obj.get_rate(h11, 5311)
+        lost5408, total5408, speed5408 = lost_obj.get_rate(h8, 5408)
+        lost5412, total5412, speed5412 = lost_obj.get_rate(h12, 5412)
 
         if i > 8:
             one_piece = total5109 / 4
@@ -248,6 +250,26 @@ def myNetwork():
         lost_rate_h12 = lost5412 / total5412
 
 
+        # process speed rate
+        speed_h5 = speed5105
+        speed_h6 = speed5206
+        speed_h7 = speed5307
+        speed_h8 = speed5408
+        speed_h9 = speed5109
+        speed_h10 = speed5210
+        speed_h11 = speed5311
+        speed_h12 = speed5412
+
+        temp_speed = [speed_h5, speed_h6, speed_h7, speed_h8,
+                      speed_h9, speed_h10, speed_h11, speed_h12]
+
+        res_speed = []
+        for l in temp_speed:
+            res_speed.append(l)
+        speeds.append(res_speed)
+
+
+        # process loss rate
         temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
                      lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
@@ -276,12 +298,13 @@ def myNetwork():
             limit[h] = limit[h] + coefficient * lost_sum
      
         print(limit)
-        print()
         res_limit = []
         for l in limit:
             res_limit.append(l)
         limits.append(res_limit)
         
+        print('speed: ', temp_speed)
+        print()
         
         # update limitation of flow speed in hosts ranging from h5 to h8
 
@@ -337,6 +360,10 @@ def myNetwork():
         for j in range(len(limits[i])):
             limits[i][j] = limits[i][j] * 10
 
+    for i in range(len(speeds)):
+        for j in range(len(speeds[i])):
+            speeds[i][j] = speeds[i][j] * 10
+
 
     # calculate avg & std
     avg1 = []
@@ -372,11 +399,11 @@ def myNetwork():
     plt.figure(figsize=(10, 6))
 
     for i in range(num_nodes):
-        node_values = [sublist[i] for sublist in limits]
-        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+5))
+        node_values = [sublist[i] for sublist in speeds]
+        plt.plot(range(1, len(speeds) + 1), node_values, color=colors[i], label='Node {}'.format(i+5))
 
     plt.xlabel('Rounds')
-    plt.ylabel('Values')
+    plt.ylabel('Speed Values')
     plt.title('Node Values')
     plt.legend()
 
@@ -429,5 +456,9 @@ def myNetwork():
 
 
 if __name__ == '__main__':
-    setLogLevel( 'info' )
-    myNetwork()
+    try:
+        setLogLevel('info')
+        myNetwork()
+    except Exception as e:
+        print("error occured:", e)
+        os.system('sudo mn -c')
