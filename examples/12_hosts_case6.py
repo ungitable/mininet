@@ -397,7 +397,7 @@ def myNetwork():
 
     for i in range(num_nodes):
         node_values = [sublist[i] for sublist in limits]
-        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+1))
+        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+5))
 
     plt.xlabel('Rounds')
     plt.ylabel('Values')
