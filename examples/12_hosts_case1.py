@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import subprocess
 from time import sleep
 import numpy as np
 from mininet.net import Mininet
@@ -215,10 +216,10 @@ def myNetwork():
 
     speeds = []
 
-    coefficient = 1
+    coefficient = 0.5
 
 
-    for i in range(1, 61):
+    for i in range(1, 11):
 
         sleep(6.0) # x.1 is accpetable
 
@@ -454,11 +455,27 @@ def myNetwork():
     # clear the network topology, switches and hosts 
     os.system('sudo mn -c')
 
-
-if __name__ == '__main__':
+def start_case1():
     try:
+        # make sure that the mininet topology has been deleted
+        os.chdir('/home/mininet/mininet/examples')
+        os.system('sudo mn -c')
+
+        # start the ryu module
+        sleep(0.5)
+        os.chdir('/usr/lib/python3/dist-packages/ryu/app')
+        subprocess.Popen(['ryu-manager', 'case0_switch.py'])
+
+        # start the mininet module
+        sleep(0.5)
+        os.chdir('/home/mininet/mininet/examples')
         setLogLevel('info')
         myNetwork()
     except Exception as e:
         print("error occured:", e)
+        # delete the mininet topology when error occured
         os.system('sudo mn -c')
+
+
+if __name__ == '__main__':
+    start_case1()
