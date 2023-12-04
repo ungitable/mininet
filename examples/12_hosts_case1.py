@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import csv
+import datetime
 import os
 import subprocess
 from time import sleep
@@ -216,10 +218,10 @@ def myNetwork():
 
     speeds = []
 
-    coefficient = 0.5
+    coefficient = 1.5
 
 
-    for i in range(1, 11):
+    for i in range(1, 5):
 
         sleep(6.0) # x.1 is accpetable
 
@@ -356,6 +358,129 @@ def myNetwork():
     print('experiment ended.')
 
 
+    # store lost, limit and speed data to csv file
+    # lost
+    with open('/home/mininet/Desktop/c3p/lost.csv', mode='w', newline='') as file:
+        trimmed_losts = [row[1:] for row in losts]
+        writer = csv.writer(file)
+        writer.writerows(trimmed_losts)
+
+    # limit
+    with open('/home/mininet/Desktop/c3p/limit.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(limits)
+
+    # speed
+    with open('/home/mininet/Desktop/c3p/speed.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(speeds)
+
+    # calculate P90, P95, P99
+    g1_p90 = 999; g2_p90 = 999
+    g1_p95 = 999; g2_p95 = 999
+    g1_p99 = 999; g2_p99 = 999
+    
+    group1_theoretical_value = 0.2
+    group2_theoretical_value = 5/45
+
+    round = 1
+    for k in losts:
+        rate = 1.0
+        
+        # for group 1
+        if g1_p90 == 999:
+            rate = 0.90
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p90 = round
+
+        if g1_p95 == 999:
+            rate = 0.95
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p95 = round
+        
+        if g1_p99 == 999:
+            rate = 0.99
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p99 = round
+        
+        # for group 2
+        if g2_p90 == 999:
+            rate = 0.90
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p90 = round
+
+        if g2_p95 == 999:
+            rate = 0.95
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p95 = round
+        
+        if g2_p99 == 999:
+            rate = 0.99
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p99 = round
+
+        round = round + 1
+
+    print('g1_p90:', g1_p90)
+    print('g2_p90:', g2_p90)
+    print('g1_p95:', g1_p95)
+    print('g2_p95:', g2_p95)
+    print('g1_p99:', g1_p99)
+    print('g2_p99:', g2_p99)
+
+    with open('/home/mininet/Desktop/c3p/p_round.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Variable', 'Value'])  
+        writer.writerow(['g1_p90', g1_p90]) 
+        writer.writerow(['g2_p90', g2_p90]) 
+        writer.writerow(['g1_p95', g1_p95])  
+        writer.writerow(['g2_p95', g2_p95])  
+        writer.writerow(['g1_p99', g1_p99])  
+        writer.writerow(['g2_p99', g2_p99])  
+
+
     # expand limits 10 times
     for i in range(len(limits)):
         for j in range(len(limits[i])):
@@ -409,8 +534,8 @@ def myNetwork():
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('/home/mininet/Desktop/pic/case1_plot1.png')
-    plt.show()
+    plt.savefig('/home/mininet/Desktop/c3p/case1_plot1.png')
+    # plt.show()
         
 
     # plot JFI
@@ -444,16 +569,27 @@ def myNetwork():
     plt.title('Group 1 and Group 2 Values')
     plt.legend()
 
-    plt.savefig('/home/mininet/Desktop/pic/case1_plot2.png')
-    plt.show()
+    plt.savefig('/home/mininet/Desktop/c3p/case1_plot2.png')
+    # plt.show()
 
-    
-    CLI(net)
+    with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['avg1', 'std1', 'avg2', 'std2', 'jfi1', 'jfi2'])
+        for i in range(len(avg1)):
+            writer.writerow([avg1[i], std1[i], avg2[i], std2[i], jfi1[i], jfi2[i]])
 
-    net.stop()
+    '''
+    in this way, will not appear:
+    ** Starting CLI:
+    mininet>
+    '''
+    # CLI(net)
+    # net.stop()
 
-    # clear the network topology, switches and hosts 
-    os.system('sudo mn -c')
+def get_current_time():
+    current_time = datetime.datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d_%H:%M:%S")
+    return current_time_str
 
 def start_case1():
     try:
@@ -471,10 +607,25 @@ def start_case1():
         os.chdir('/home/mininet/mininet/examples')
         setLogLevel('info')
         myNetwork()
+
+        # clear the network topology, switches and hosts 
+        os.system('sudo mn -c')
     except Exception as e:
         print("error occured:", e)
         # delete the mininet topology when error occured
         os.system('sudo mn -c')
+
+    try:
+        # store the data
+        sleep(5.0)
+        os.chdir('/home/mininet/Desktop')
+        case_str = 'case1'
+        time_str = get_current_time()
+        filename = time_str + '_' + case_str
+        cmd = 'zip -v -o c3p_data/{0}.zip c3p/*'.format(filename)
+        os.system(cmd)
+    except Exception as e:
+        print("error occured:", e)
 
 
 if __name__ == '__main__':
