@@ -215,10 +215,10 @@ def myNetwork():
 
     speeds = []
 
-    coefficient = 2
+    coefficient = 1
 
 
-    for i in range(1, 31):
+    for i in range(1, 61):
 
         sleep(6.0) 
 
@@ -479,13 +479,7 @@ def myNetwork():
     plt.savefig('/home/mininet/Desktop/c3p/case5_plot1.png')
     # plt.show()
 
-    with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['avg', 'std', 'jfi'])
-        for i in range(len(avg)-1):
-            writer.writerow([avg[i], std[i],  jfi[i]])
-        
-
+    
     # plot JFI
     jfi = []
 
@@ -507,6 +501,12 @@ def myNetwork():
 
     plt.savefig('/home/mininet/Desktop/c3p/case5_plot2.png')
     # plt.show()
+
+    with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['avg', 'std', 'jfi'])
+        for i in range(len(avg)-1):
+            writer.writerow([avg[i], std[i],  jfi[i]])
 
     '''
     in this way, will not appear:

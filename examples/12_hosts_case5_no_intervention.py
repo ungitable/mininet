@@ -215,10 +215,10 @@ def myNetwork():
 
     speeds = []
 
-    coefficient = 2
+    coefficient = 1
 
 
-    for i in range(1, 31):
+    for i in range(1, 61):
 
         sleep(6.0) 
 
