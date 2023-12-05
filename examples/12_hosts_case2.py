@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+import csv
+import datetime
 import os
+import subprocess
 from time import sleep
 import numpy as np
 from mininet.net import Mininet
@@ -214,24 +217,26 @@ def myNetwork():
         res_limit.append(l)
     limits.append(res_limit)
 
+    speeds = []
+
     coefficient = 1
 
 
-    for i in range(1, 41):
+    for i in range(1, 61):
         
-        sleep(6.0) # x.1 is accpetable
+        sleep(6.0)
 
         # get lost
         # format: lost / total
 
-        lost5105, total5105 = lost_obj.get_rate(h5, 5105)
-        lost5109, total5109 = lost_obj.get_rate(h9, 5109)
-        lost5206, total5206 = lost_obj.get_rate(h6, 5206)
-        lost5210, total5210 = lost_obj.get_rate(h10, 5210)
-        lost5307, total5307 = lost_obj.get_rate(h7, 5307)
-        lost5311, total5311 = lost_obj.get_rate(h11, 5311)
-        lost5408, total5408 = lost_obj.get_rate(h8, 5408)
-        lost5412, total5412 = lost_obj.get_rate(h12, 5412)
+        lost5105, total5105, speed5105 = lost_obj.get_rate(h5, 5105)
+        lost5109, total5109, speed5109 = lost_obj.get_rate(h9, 5109)
+        lost5206, total5206, speed5206 = lost_obj.get_rate(h6, 5206)
+        lost5210, total5210, speed5210 = lost_obj.get_rate(h10, 5210)
+        lost5307, total5307, speed5307 = lost_obj.get_rate(h7, 5307)
+        lost5311, total5311, speed5311 = lost_obj.get_rate(h11, 5311)
+        lost5408, total5408, speed5408 = lost_obj.get_rate(h8, 5408)
+        lost5412, total5412, speed5412 = lost_obj.get_rate(h12, 5412)
 
         if i > 8:
             one_piece = total5109 / 4
@@ -248,6 +253,26 @@ def myNetwork():
         lost_rate_h12 = lost5412 / total5412
 
 
+        # process speed rate
+        speed_h5 = speed5105
+        speed_h6 = speed5206
+        speed_h7 = speed5307
+        speed_h8 = speed5408
+        speed_h9 = speed5109
+        speed_h10 = speed5210
+        speed_h11 = speed5311
+        speed_h12 = speed5412
+
+        temp_speed = [speed_h5, speed_h6, speed_h7, speed_h8,
+                      speed_h9, speed_h10, speed_h11, speed_h12]
+
+        res_speed = []
+        for l in temp_speed:
+            res_speed.append(l)
+        speeds.append(res_speed)
+
+
+        # process loss rate
         temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
                      lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
@@ -276,11 +301,13 @@ def myNetwork():
             limit[h] = limit[h] + coefficient * lost_sum
      
         print(limit)
-        print()
         res_limit = []
         for l in limit:
             res_limit.append(l)
         limits.append(res_limit)
+
+        print('speed: ', temp_speed)
+        print()
         
         
         # update limitation of flow speed in hosts ranging from h5 to h8
@@ -337,6 +364,129 @@ def myNetwork():
     print('experiment ended.')
 
 
+    # store lost, limit and speed data to csv file
+    # lost
+    with open('/home/mininet/Desktop/c3p/lost.csv', mode='w', newline='') as file:
+        trimmed_losts = [row[1:] for row in losts]
+        writer = csv.writer(file)
+        writer.writerows(trimmed_losts)
+
+    # limit
+    with open('/home/mininet/Desktop/c3p/limit.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(limits)
+
+    # speed
+    with open('/home/mininet/Desktop/c3p/speed.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(speeds)
+
+    # calculate P90, P95, P99
+    g1_p90 = 999; g2_p90 = 999
+    g1_p95 = 999; g2_p95 = 999
+    g1_p99 = 999; g2_p99 = 999
+    
+    group1_theoretical_value = 0.5
+    group2_theoretical_value = 3/7
+
+    round = 1
+    for k in losts:
+        rate = 1.0
+        
+        # for group 1
+        if g1_p90 == 999:
+            rate = 0.90
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p90 = round
+
+        if g1_p95 == 999:
+            rate = 0.95
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p95 = round
+        
+        if g1_p99 == 999:
+            rate = 0.99
+            maxl = group1_theoretical_value / rate
+            minl = group1_theoretical_value * rate
+            flag = True
+            for j in range(1, 5):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g1_p99 = round
+        
+        # for group 2
+        if g2_p90 == 999:
+            rate = 0.90
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p90 = round
+
+        if g2_p95 == 999:
+            rate = 0.95
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p95 = round
+        
+        if g2_p99 == 999:
+            rate = 0.99
+            maxl = group2_theoretical_value / rate
+            minl = group2_theoretical_value * rate
+            flag = True
+            for j in range(5, 9):
+                if k[j] < minl or k[j] > maxl:
+                    flag = False
+                    break
+            if flag == True:
+                g2_p99 = round
+
+        round = round + 1
+
+    print('g1_p90:', g1_p90)
+    print('g2_p90:', g2_p90)
+    print('g1_p95:', g1_p95)
+    print('g2_p95:', g2_p95)
+    print('g1_p99:', g1_p99)
+    print('g2_p99:', g2_p99)
+
+    with open('/home/mininet/Desktop/c3p/p_round.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Variable', 'Value'])  
+        writer.writerow(['g1_p90', g1_p90]) 
+        writer.writerow(['g2_p90', g2_p90]) 
+        writer.writerow(['g1_p95', g1_p95])  
+        writer.writerow(['g2_p95', g2_p95])  
+        writer.writerow(['g1_p99', g1_p99])  
+        writer.writerow(['g2_p99', g2_p99])  
+
+
     # expand limits 10 times
     for i in range(len(limits)):
         for j in range(len(limits[i])):
@@ -377,17 +527,17 @@ def myNetwork():
     plt.figure(figsize=(10, 6))
 
     for i in range(num_nodes):
-        node_values = [sublist[i] for sublist in limits]
-        plt.plot(range(1, len(limits) + 1), node_values, color=colors[i], label='Node {}'.format(i+5))
+        node_values = [sublist[i] for sublist in speeds]
+        plt.plot(range(1, len(speeds) + 1), node_values, color=colors[i], label='Node {}'.format(i+5))
 
     plt.xlabel('Rounds')
-    plt.ylabel('Values')
+    plt.ylabel('Speed Values')
     plt.title('Node Values')
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('/home/mininet/Desktop/pic/case2_plot1.png')
-    plt.show()
+    plt.savefig('/home/mininet/Desktop/c3p/case2_plot1.png')
+    # plt.show()
         
 
     # plot JFI
@@ -421,18 +571,64 @@ def myNetwork():
     plt.title('Group 1 and Group 2 Values')
     plt.legend()
 
-    plt.savefig('/home/mininet/Desktop/pic/case2_plot2.png')
-    plt.show()
+    plt.savefig('/home/mininet/Desktop/c3p/case2_plot2.png')
+    # plt.show()
 
-    
-    CLI(net)
+    with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['avg1', 'std1', 'avg2', 'std2', 'jfi1', 'jfi2'])
+        for i in range(len(avg1)-1):
+            writer.writerow([avg1[i], std1[i], avg2[i], std2[i], jfi1[i], jfi2[i]])
 
-    net.stop()
+    '''
+    in this way, will not appear:
+    ** Starting CLI:
+    mininet>
+    '''
+    # CLI(net)
+    # net.stop()
 
-    # clear the network topology, switches and hosts 
-    os.system('sudo mn -c')
+def get_current_time():
+    current_time = datetime.datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d_%H:%M:%S")
+    return current_time_str
+
+def start_case2():
+    try:
+        # make sure that the mininet topology has been deleted
+        os.chdir('/home/mininet/mininet/examples')
+        os.system('sudo mn -c')
+
+        # start the ryu module
+        sleep(0.5)
+        os.chdir('/usr/lib/python3/dist-packages/ryu/app')
+        subprocess.Popen(['ryu-manager', 'case0_switch.py'])
+
+        # start the mininet module
+        sleep(0.5)
+        os.chdir('/home/mininet/mininet/examples')
+        setLogLevel('info')
+        myNetwork()
+
+        # clear the network topology, switches and hosts 
+        os.system('sudo mn -c')
+    except Exception as e:
+        print("error occured:", e)
+        # delete the mininet topology when error occured
+        os.system('sudo mn -c')
+
+    try:
+        # store the data
+        sleep(5.0)
+        os.chdir('/home/mininet/Desktop')
+        case_str = 'case2'
+        time_str = get_current_time()
+        filename = time_str + '_' + case_str
+        cmd = 'zip -v -o c3p_data/{0}.zip c3p/*'.format(filename)
+        os.system(cmd)
+    except Exception as e:
+        print("error occured:", e)
 
 
 if __name__ == '__main__':
-    setLogLevel( 'info' )
-    myNetwork()
+    start_case2()

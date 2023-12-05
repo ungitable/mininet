@@ -218,12 +218,12 @@ def myNetwork():
 
     speeds = []
 
-    coefficient = 1.5
+    coefficient = 1
 
 
-    for i in range(1, 5):
+    for i in range(1, 31):
 
-        sleep(6.0) # x.1 is accpetable
+        sleep(6.0)
 
         # get lost
         # format: lost / total
@@ -563,7 +563,7 @@ def myNetwork():
 
     plt.plot(range(1, len(jfi1) + 1), jfi1, color='blue', label='Group 1')
     plt.plot(range(1, len(jfi2) + 1), jfi2, color='red', label='Group 2')
-
+  
     plt.xlabel('Rounds')
     plt.ylabel('Values')
     plt.title('Group 1 and Group 2 Values')
@@ -575,9 +575,9 @@ def myNetwork():
     with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['avg1', 'std1', 'avg2', 'std2', 'jfi1', 'jfi2'])
-        for i in range(len(avg1)):
+        for i in range(len(avg1)-1):
             writer.writerow([avg1[i], std1[i], avg2[i], std2[i], jfi1[i], jfi2[i]])
-
+    print('121')
     '''
     in this way, will not appear:
     ** Starting CLI:
