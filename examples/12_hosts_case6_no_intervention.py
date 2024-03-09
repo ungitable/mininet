@@ -232,6 +232,8 @@ def myNetwork():
 
     speeds = []
 
+    em = []
+
     coefficient = 1
 
 
@@ -295,6 +297,17 @@ def myNetwork():
             res_speed.append(l)
         speeds.append(res_speed)
 
+        speed_g1_e = speed5005+speed5006+speed5007+speed5008
+        speed_g1_m = speed5205+speed5206+speed5207+speed5208
+        speed_g2_e = speed5009+speed5010+speed5011+speed5012
+        speed_g2_m = speed5209+speed5210+speed5211+speed5212
+
+        temp_em = [speed_g1_e, speed_g1_m, speed_g2_e, speed_g2_m]
+        res_em = []
+        for l in temp_em:
+            res_em.append(l)
+        em.append(res_em)
+
         
         # update limiting rate
         lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
@@ -335,8 +348,8 @@ def myNetwork():
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, speed_host1)))
             clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, speed_host1)))
         else:
-            clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, 15)))
-            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, 15)))
+            clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, 25)))
+            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, 25)))
 
         
         clients.append(Thread(target=cmd_client, args=(h1, h6, 5006, flow_host, speed_host1)))
@@ -381,6 +394,12 @@ def myNetwork():
     with open('/home/mininet/Desktop/c3p/speed.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(speeds)
+
+    # em
+    with open('/home/mininet/Desktop/c3p/em.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(em)
+
 
     # calculate P90, P95, P99
     g1_p90 = 999

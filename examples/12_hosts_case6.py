@@ -232,6 +232,8 @@ def myNetwork():
 
     speeds = []
 
+    em = []
+
     coefficient = 1
 
 
@@ -262,11 +264,11 @@ def myNetwork():
 
     
         if i > 8:
-            one_piece = total5005 / 3
+            one_piece = total5005 / 5 * 3
             lost5005 = lost5005 - one_piece
             total5005 = total5005 - one_piece
 
-            second_piece = total5009 / 3
+            second_piece = total5009 / 5 * 3
             lost5009 = lost5009 - second_piece
             total5009 = total5009 - second_piece
 
@@ -304,6 +306,18 @@ def myNetwork():
         for l in temp_speed:
             res_speed.append(l)
         speeds.append(res_speed)
+
+        
+        speed_g1_e = speed5005+speed5006+speed5007+speed5008
+        speed_g1_m = speed5205+speed5206+speed5207+speed5208
+        speed_g2_e = speed5009+speed5010+speed5011+speed5012
+        speed_g2_m = speed5209+speed5210+speed5211+speed5212
+
+        temp_em = [speed_g1_e, speed_g1_m, speed_g2_e, speed_g2_m]
+        res_em = []
+        for l in temp_em:
+            res_em.append(l)
+        em.append(res_em)
 
         
         # update limiting rate
@@ -361,8 +375,8 @@ def myNetwork():
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, speed_host1)))
             clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, speed_host1)))
         else:
-            clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, 15)))
-            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, 15)))
+            clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, 25)))
+            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, 25)))
 
         
         clients.append(Thread(target=cmd_client, args=(h1, h6, 5006, flow_host, speed_host1)))
@@ -407,6 +421,12 @@ def myNetwork():
     with open('/home/mininet/Desktop/c3p/speed.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(speeds)
+
+    # em
+    with open('/home/mininet/Desktop/c3p/em.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(em)
+
 
     # calculate P90, P95, P99
     g1_p90 = 999; g2_p90 = 999

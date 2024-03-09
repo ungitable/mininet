@@ -190,10 +190,10 @@ def myNetwork():
     clients.append(Thread(target=cmd_client, args=(h1, h7, 5007, flow_host, speed_host)))
     clients.append(Thread(target=cmd_client, args=(h1, h8, 5008, flow_host, speed_host)))
 
-    clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, speed_host)))
-    clients.append(Thread(target=cmd_client, args=(h1, h10, 5010, flow_host, speed_host)))
-    clients.append(Thread(target=cmd_client, args=(h1, h11, 5011, flow_host, speed_host)))
-    clients.append(Thread(target=cmd_client, args=(h1, h12, 5012, flow_host, speed_host)))
+    clients.append(Thread(target=cmd_client, args=(h2, h9, 5009, flow_host, speed_host)))
+    clients.append(Thread(target=cmd_client, args=(h2, h10, 5010, flow_host, speed_host)))
+    clients.append(Thread(target=cmd_client, args=(h2, h11, 5011, flow_host, speed_host)))
+    clients.append(Thread(target=cmd_client, args=(h2, h12, 5012, flow_host, speed_host)))
 
     for client in clients:
         client.start()
@@ -334,18 +334,18 @@ def myNetwork():
         clients = []
         if i < 5:
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, speed_host)))
-            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, speed_host)))
+            clients.append(Thread(target=cmd_client, args=(h2, h9, 5009, flow_host, speed_host)))
         else:
             clients.append(Thread(target=cmd_client, args=(h1, h5, 5005, flow_host, 40)))
-            clients.append(Thread(target=cmd_client, args=(h1, h9, 5009, flow_host, 40)))
+            clients.append(Thread(target=cmd_client, args=(h2, h9, 5009, flow_host, 40)))
 
         clients.append(Thread(target=cmd_client, args=(h1, h6, 5006, flow_host, speed_host)))
         clients.append(Thread(target=cmd_client, args=(h1, h7, 5007, flow_host, speed_host)))
         clients.append(Thread(target=cmd_client, args=(h1, h8, 5008, flow_host, speed_host)))
 
-        clients.append(Thread(target=cmd_client, args=(h1, h10, 5010, flow_host, speed_host)))
-        clients.append(Thread(target=cmd_client, args=(h1, h11, 5011, flow_host, speed_host)))
-        clients.append(Thread(target=cmd_client, args=(h1, h12, 5012, flow_host, speed_host)))
+        clients.append(Thread(target=cmd_client, args=(h2, h10, 5010, flow_host, speed_host)))
+        clients.append(Thread(target=cmd_client, args=(h2, h11, 5011, flow_host, speed_host)))
+        clients.append(Thread(target=cmd_client, args=(h2, h12, 5012, flow_host, speed_host)))
 
 
         for client in clients:

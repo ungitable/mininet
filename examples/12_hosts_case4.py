@@ -165,14 +165,14 @@ def myNetwork():
     sleep(3.0)
 
     servers = []
-    servers.append(Thread(target=cmd_server, args=(h5, 5105)))
-    servers.append(Thread(target=cmd_server, args=(h6, 5106)))
-    servers.append(Thread(target=cmd_server, args=(h7, 5207)))
-    servers.append(Thread(target=cmd_server, args=(h8, 5208)))
-    servers.append(Thread(target=cmd_server, args=(h5, 5305)))
-    servers.append(Thread(target=cmd_server, args=(h6, 5306)))
-    servers.append(Thread(target=cmd_server, args=(h7, 5407)))
-    servers.append(Thread(target=cmd_server, args=(h8, 5408)))
+    # servers.append(Thread(target=cmd_server, args=(h5, 5105)))
+    # servers.append(Thread(target=cmd_server, args=(h6, 5106)))
+    # servers.append(Thread(target=cmd_server, args=(h7, 5207)))
+    # servers.append(Thread(target=cmd_server, args=(h8, 5208)))
+    # servers.append(Thread(target=cmd_server, args=(h5, 5305)))
+    # servers.append(Thread(target=cmd_server, args=(h6, 5306)))
+    # servers.append(Thread(target=cmd_server, args=(h7, 5407)))
+    # servers.append(Thread(target=cmd_server, args=(h8, 5408)))
 
     servers.append(Thread(target=cmd_server, args=(h9, 5109)))
     servers.append(Thread(target=cmd_server, args=(h10, 5110)))
@@ -196,14 +196,14 @@ def myNetwork():
     flow_host34 = 'udp'
 
     clients = []
-    clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
-    clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, speed_host12)))
-    clients.append(Thread(target=cmd_client, args=(h3, h5, 5305, flow_host34, speed_host34)))
-    clients.append(Thread(target=cmd_client, args=(h3, h6, 5306, flow_host34, speed_host34)))
-    clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
-    clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
-    clients.append(Thread(target=cmd_client, args=(h4, h7, 5407, flow_host34, speed_host34)))
-    clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
+    # clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
+    # clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, speed_host12)))
+    # clients.append(Thread(target=cmd_client, args=(h3, h5, 5305, flow_host34, speed_host34)))
+    # clients.append(Thread(target=cmd_client, args=(h3, h6, 5306, flow_host34, speed_host34)))
+    # clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
+    # clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
+    # clients.append(Thread(target=cmd_client, args=(h4, h7, 5407, flow_host34, speed_host34)))
+    # clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
 
     clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
     clients.append(Thread(target=cmd_client, args=(h1, h10, 5110, flow_host12, speed_host12)))
@@ -223,7 +223,7 @@ def myNetwork():
     losts = []
 
     limit = []
-    for i in range(8):
+    for i in range(4):
         limit.append(10.0)
 
     limits = []
@@ -237,18 +237,18 @@ def myNetwork():
     coefficient = 1
 
 
-    for i in range(1, 61):
+    for i in range(1, 51):
         
         sleep(6.0) 
 
-        lost5105, total5105, speed5105 = lost_obj.get_rate(h5, 5105)
-        lost5106, total5106, speed5106 = lost_obj.get_rate(h6, 5106)
-        lost5207, total5207, speed5207 = lost_obj.get_rate(h7, 5207)
-        lost5208, total5208, speed5208 = lost_obj.get_rate(h8, 5208)
-        lost5305, total5305, speed5305 = lost_obj.get_rate(h5, 5305)
-        lost5306, total5306, speed5306 = lost_obj.get_rate(h6, 5306)
-        lost5407, total5407, speed5407 = lost_obj.get_rate(h7, 5407)
-        lost5408, total5408, speed5408 = lost_obj.get_rate(h8, 5408)
+        # lost5105, total5105, speed5105 = lost_obj.get_rate(h5, 5105)
+        # lost5106, total5106, speed5106 = lost_obj.get_rate(h6, 5106)
+        # lost5207, total5207, speed5207 = lost_obj.get_rate(h7, 5207)
+        # lost5208, total5208, speed5208 = lost_obj.get_rate(h8, 5208)
+        # lost5305, total5305, speed5305 = lost_obj.get_rate(h5, 5305)
+        # lost5306, total5306, speed5306 = lost_obj.get_rate(h6, 5306)
+        # lost5407, total5407, speed5407 = lost_obj.get_rate(h7, 5407)
+        # lost5408, total5408, speed5408 = lost_obj.get_rate(h8, 5408)
 
         lost5109, total5109, speed5109 = lost_obj.get_rate(h9, 5109)
         lost5110, total5110, speed5110 = lost_obj.get_rate(h10, 5110)
@@ -269,10 +269,10 @@ def myNetwork():
             total5110 = total5110 - second_piece
             lost5110 = lost5110 - second_piece
 
-        lost_rate_h5 = (lost5105 + lost5305) / (total5105 + total5305)
-        lost_rate_h6 = (lost5106 + lost5306) / (total5106 + total5306) 
-        lost_rate_h7 = (lost5207 + lost5407) / (total5207 + total5407)
-        lost_rate_h8 = (lost5208 + lost5408) / (total5208 + total5408)
+        # lost_rate_h5 = (lost5105 + lost5305) / (total5105 + total5305)
+        # lost_rate_h6 = (lost5106 + lost5306) / (total5106 + total5306) 
+        # lost_rate_h7 = (lost5207 + lost5407) / (total5207 + total5407)
+        # lost_rate_h8 = (lost5208 + lost5408) / (total5208 + total5408)
 
         lost_rate_h9 = (lost5109 + lost5309) / (total5109 + total5309)
         lost_rate_h10 = (lost5110 + lost5310) / (total5110 + total5310) 
@@ -280,23 +280,23 @@ def myNetwork():
         lost_rate_h12 = (lost5212 + lost5412) / (total5212 + total5412)
 
 
-        temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
-                     lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
+        temp_list = [i, lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
+                    #  lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
         print(temp_list)
         losts.append(temp_list)
 
         # process speed rate
-        speed_h5 = speed5105 + speed5305
-        speed_h6 = speed5106 + speed5306
-        speed_h7 = speed5207 + speed5407
-        speed_h8 = speed5208 + speed5408
+        # speed_h5 = speed5105 + speed5305
+        # speed_h6 = speed5106 + speed5306
+        # speed_h7 = speed5207 + speed5407
+        # speed_h8 = speed5208 + speed5408
         speed_h9 = speed5109 + speed5309
         speed_h10 = speed5110 + speed5310
         speed_h11 = speed5211 + speed5411
         speed_h12 = speed5212 + speed5412
         
-        temp_speed = [speed_h5, speed_h6, speed_h7, speed_h8,
-                      speed_h9, speed_h10, speed_h11, speed_h12]
+        temp_speed = [speed_h9, speed_h10, speed_h11, speed_h12]
+                    #   speed_h9, speed_h10, speed_h11, speed_h12]
 
         res_speed = []
         for l in temp_speed:
@@ -304,16 +304,9 @@ def myNetwork():
         speeds.append(res_speed)
 
 
-        # process loss rate
-        temp_list = [i, lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
-                     lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
-        print(temp_list)
-        losts.append(temp_list)
-        
-
         # update limiting rate
-        lost_list = [lost_rate_h5, lost_rate_h6, lost_rate_h7, lost_rate_h8,
-                     lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
+        lost_list = [lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
+                    #  lost_rate_h9, lost_rate_h10, lost_rate_h11, lost_rate_h12,]
 
 
         # use c3p strategy independently
@@ -324,13 +317,13 @@ def myNetwork():
             lost_sum = lost_list[h] * 2 - lost_list[left] - lost_list[right]
             limit[h] = limit[h] + coefficient * lost_sum
 
-        # for hosts ranging from h9 to h12
-        for h in range(4, 8):
-            t = h - 4
-            left = (t+4-1) % 4 + 4
-            right = (t+1) % 4 + 4
-            lost_sum = lost_list[h] * 2 - lost_list[left] - lost_list[right]
-            limit[h] = limit[h] + coefficient * lost_sum
+        # # for hosts ranging from h9 to h12
+        # for h in range(4, 8):
+        #     t = h - 4
+        #     left = (t+4-1) % 4 + 4
+        #     right = (t+1) % 4 + 4
+        #     lost_sum = lost_list[h] * 2 - lost_list[left] - lost_list[right]
+        #     limit[h] = limit[h] + coefficient * lost_sum
      
         print(limit)
         res_limit = []
@@ -344,9 +337,9 @@ def myNetwork():
         
         # update limitation of flow speed in hosts ranging from h5 to h8
 
-        for j in range(8):
+        for j in range(4):
             command = 'ovs-ofctl mod-meter s2 "meter={},kbps,burst,band=type=drop,rate={},burst_size={}" -O OpenFlow13; \
-                        '.format(j+2, int(limit[j]*1024), 100)
+                        '.format(j+6, int(limit[j]*1024), 100)
             
             output = c0.cmd(command)
             # print(output)
@@ -370,33 +363,33 @@ def myNetwork():
 
         clients = []
         if i < 5:
-            clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
-            clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, speed_host12)))
+            # clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, speed_host12)))
+            # clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, speed_host12)))
             clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, speed_host12)))
             clients.append(Thread(target=cmd_client, args=(h1, h10, 5110, flow_host12, speed_host12)))
-            clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
-            clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
+            # clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
+            # clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
             clients.append(Thread(target=cmd_client, args=(h2, h11, 5211, flow_host12, speed_host12)))
             clients.append(Thread(target=cmd_client, args=(h2, h12, 5212, flow_host12, speed_host12)))
         else:
-            clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, 40)))
-            clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, 40)))
+            # clients.append(Thread(target=cmd_client, args=(h1, h5, 5105, flow_host12, 40)))
+            # clients.append(Thread(target=cmd_client, args=(h1, h6, 5106, flow_host12, 40)))
             clients.append(Thread(target=cmd_client, args=(h1, h9, 5109, flow_host12, 40)))
             clients.append(Thread(target=cmd_client, args=(h1, h10, 5110, flow_host12, 40)))
-            clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, 20)))
-            clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, 20)))
+            # clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, 20)))
+            # clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, 20)))
             clients.append(Thread(target=cmd_client, args=(h2, h11, 5211, flow_host12, 20)))
             clients.append(Thread(target=cmd_client, args=(h2, h12, 5212, flow_host12, 20)))
 
-        clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
-        clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
+        # clients.append(Thread(target=cmd_client, args=(h2, h7, 5207, flow_host12, speed_host12)))
+        # clients.append(Thread(target=cmd_client, args=(h2, h8, 5208, flow_host12, speed_host12)))
         clients.append(Thread(target=cmd_client, args=(h2, h11, 5211, flow_host12, speed_host12)))
         clients.append(Thread(target=cmd_client, args=(h2, h12, 5212, flow_host12, speed_host12)))
 
-        clients.append(Thread(target=cmd_client, args=(h3, h5, 5305, flow_host34, speed_host34)))
-        clients.append(Thread(target=cmd_client, args=(h3, h6, 5306, flow_host34, speed_host34)))
-        clients.append(Thread(target=cmd_client, args=(h4, h7, 5407, flow_host34, speed_host34)))
-        clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
+        # clients.append(Thread(target=cmd_client, args=(h3, h5, 5305, flow_host34, speed_host34)))
+        # clients.append(Thread(target=cmd_client, args=(h3, h6, 5306, flow_host34, speed_host34)))
+        # clients.append(Thread(target=cmd_client, args=(h4, h7, 5407, flow_host34, speed_host34)))
+        # clients.append(Thread(target=cmd_client, args=(h4, h8, 5408, flow_host34, speed_host34)))
 
         clients.append(Thread(target=cmd_client, args=(h3, h9, 5309, flow_host34, speed_host34)))
         clients.append(Thread(target=cmd_client, args=(h3, h10, 5310, flow_host34, speed_host34)))
@@ -427,142 +420,11 @@ def myNetwork():
         writer = csv.writer(file)
         writer.writerows(speeds)
 
-    # calculate P90, P95, P99
-    g1_p90 = 999; g2_p90 = 999
-    g1_p95 = 999; g2_p95 = 999
-    g1_p99 = 999; g2_p99 = 999
-    
-    group1_theoretical_value = 1 - 40/128
-    group2_theoretical_value = 1 - 40/108
 
-    round = 1
-    for k in losts:
-        rate = 1.0
-        
-        # for group 1
-        if g1_p90 == 999:
-            rate = 0.90
-            maxl = group1_theoretical_value / rate
-            minl = group1_theoretical_value * rate
-            flag = True
-            for j in range(1, 5):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g1_p90 = round
-
-        if g1_p95 == 999:
-            rate = 0.95
-            maxl = group1_theoretical_value / rate
-            minl = group1_theoretical_value * rate
-            flag = True
-            for j in range(1, 5):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g1_p95 = round
-        
-        if g1_p99 == 999:
-            rate = 0.99
-            maxl = group1_theoretical_value / rate
-            minl = group1_theoretical_value * rate
-            flag = True
-            for j in range(1, 5):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g1_p99 = round
-        
-        # for group 2
-        if g2_p90 == 999:
-            rate = 0.90
-            maxl = group2_theoretical_value / rate
-            minl = group2_theoretical_value * rate
-            flag = True
-            for j in range(5, 9):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g2_p90 = round
-
-        if g2_p95 == 999:
-            rate = 0.95
-            maxl = group2_theoretical_value / rate
-            minl = group2_theoretical_value * rate
-            flag = True
-            for j in range(5, 9):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g2_p95 = round
-        
-        if g2_p99 == 999:
-            rate = 0.99
-            maxl = group2_theoretical_value / rate
-            minl = group2_theoretical_value * rate
-            flag = True
-            for j in range(5, 9):
-                if k[j] < minl or k[j] > maxl:
-                    flag = False
-                    break
-            if flag == True:
-                g2_p99 = round
-
-        round = round + 1
-
-    print('g1_p90:', g1_p90)
-    print('g2_p90:', g2_p90)
-    print('g1_p95:', g1_p95)
-    print('g2_p95:', g2_p95)
-    print('g1_p99:', g1_p99)
-    print('g2_p99:', g2_p99)
-
-    with open('/home/mininet/Desktop/c3p/p_round.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Variable', 'Value'])  
-        writer.writerow(['g1_p90', g1_p90]) 
-        writer.writerow(['g2_p90', g2_p90]) 
-        writer.writerow(['g1_p95', g1_p95])  
-        writer.writerow(['g2_p95', g2_p95])  
-        writer.writerow(['g1_p99', g1_p99])  
-        writer.writerow(['g2_p99', g2_p99])  
-
-    # expand limits 10 times
-    for i in range(len(limits)):
-        for j in range(len(limits[i])):
-            limits[i][j] = limits[i][j] * 10
-
-
-    # calculate avg & std
-    avg1 = []
-    std1 = []
-    avg2 = []
-    std2 = []
-
-    for k in range(len(limits)):
-        arr1 = limits[k][0:4]
-        arr2 = limits[k][4:]
-
-        arr1_mean = np.mean(arr1)
-        arr1_std = np.std(arr1)
-        arr2_mean = np.mean(arr2)
-        arr2_std = np.std(arr2)
-        # print(arr, arr_mean, arr_std)
-
-        avg1.append(arr1_mean)
-        std1.append(arr1_std)
-        avg2.append(arr2_mean)
-        std2.append(arr2_std)
-
-    print('avg1:', avg1)
-    print('std1:', std1)
-    print('avg2:', avg2)
-    print('std2:', std2)
+    # # expand limits 10 times
+    # for i in range(len(limits)):
+    #     for j in range(len(limits[i])):
+    #         limits[i][j] = limits[i][j] * 10
 
 
     # plot 8 hosts limits
@@ -587,29 +449,29 @@ def myNetwork():
 
     # plot JFI
     jfi1 = []
-    jfi2 = []
+    # jfi2 = []
 
     for k in range(len(losts)):
         arr1 = losts[k][1:5]
-        arr2 = losts[k][5:]
+        # arr2 = losts[k][5:]
 
         # for group1
         numerator = np.sum(arr1) ** 2
         denominator = len(arr1) * sum([x**2 for x in arr1])
         jfi1.append(numerator/denominator)
 
-        # for group2
-        numerator = np.sum(arr2) ** 2
-        denominator = len(arr2) * sum([x**2 for x in arr2])
-        jfi2.append(numerator/denominator)
+        # # for group2
+        # numerator = np.sum(arr2) ** 2
+        # denominator = len(arr2) * sum([x**2 for x in arr2])
+        # jfi2.append(numerator/denominator)
 
     print('jfi1:', jfi1)
-    print('jfi2:', jfi2)
+    # print('jfi2:', jfi2)
 
     plt.figure(figsize=(10, 6))
 
     plt.plot(range(1, len(jfi1) + 1), jfi1, color='blue', label='Group 1')
-    plt.plot(range(1, len(jfi2) + 1), jfi2, color='red', label='Group 2')
+    # plt.plot(range(1, len(jfi2) + 1), jfi2, color='red', label='Group 2')
 
     plt.xlabel('Rounds')
     plt.ylabel('Values')
@@ -622,9 +484,9 @@ def myNetwork():
 
     with open('/home/mininet/Desktop/c3p/avg_std_jfi.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['avg1', 'std1', 'avg2', 'std2', 'jfi1', 'jfi2'])
-        for i in range(len(avg1)-1):
-            writer.writerow([avg1[i], std1[i], avg2[i], std2[i], jfi1[i], jfi2[i]])
+        writer.writerow(['jfi'])
+        for i in range(len(speeds)-1):
+            writer.writerow([jfi1[i]])
 
     '''
     in this way, will not appear:

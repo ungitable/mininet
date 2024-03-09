@@ -221,7 +221,7 @@ def myNetwork():
     coefficient = 1
 
 
-    for i in range(1, 61):
+    for i in range(1, 51):
 
         sleep(6.0)
 
