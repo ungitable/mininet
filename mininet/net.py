@@ -695,6 +695,42 @@ class Mininet( object ):
             output( "*** Warning: No packets sent\n" )
         return ploss
 
+    def stop_2( self ):
+        "Stop the controller(s), switches and hosts"
+        info( '*** Stopping %i controllers\n' % len( self.controllers ) )
+        for controller in self.controllers:
+            info( controller.name + ' ' )
+            controller.stop()
+        info( '\n' )
+        if self.terms:
+            info( '*** Stopping %i terms\n' % len( self.terms ) )
+            self.stopXterms()
+        info( '*** Stopping %i links\n' % len( self.links ) )
+        for link in self.links:
+            info( '.' )
+            link.stop()
+        info( '\n' )
+        info( '*** Stopping %i switches\n' % len( self.switches ) )
+        stopped = {}
+        for swclass, switches in groupby(
+                sorted( self.switches,
+                        key=lambda s: str( type( s ) ) ), type ):
+            switches = tuple( switches )
+            if hasattr( swclass, 'batchShutdown' ):
+                success = swclass.batchShutdown( switches )
+                stopped.update( { s: s for s in success } )
+        for switch in self.switches:
+            info( switch.name + ' ' )
+            if switch not in stopped:
+                switch.stop()
+            switch.terminate()
+        info( '\n' )
+        info( '*** Stopping %i hosts\n' % len( self.hosts ) )
+        for host in self.hosts:
+            info( host.name + ' ' )
+            host.terminate()
+        info( '\n*** Done\n' )
+        
     @staticmethod
     def _parsePingFull( pingOutput ):
         "Parse ping output and return all data."
